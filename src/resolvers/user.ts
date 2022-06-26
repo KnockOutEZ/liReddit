@@ -9,6 +9,7 @@ import {
   Ctx,
   Field,
   InputType,
+  Int,
   Mutation,
   ObjectType,
   Query,
@@ -55,17 +56,21 @@ class UserResponse{
     @Field(()=>User,{nullable:true})
     user?:User
 
-    @Field(()=>String)
-    token?:String[]
+    @Field(()=>String,{nullable:true})
+    token?:String
 }
 
 @Resolver()
 export class UserResolver {
 
-@Query(() => String)
-@UseMiddleware(isAuth)
-async Me(@Ctx() { payload }: MyContext) {
-    return `Your user id : ${payload!.userId}`;
+@Mutation(() => String)
+async Me(
+    @Arg("token") token:string,
+    @Ctx() { }: MyContext) {
+    // const jwt = token.split(" ")[1];
+    const payload = verify(token, "process.env.JWT_SECRET");
+    // payload.name
+    return(JSON.stringify(payload))
 }
 
 
@@ -194,6 +199,8 @@ async Me(@Ctx() { payload }: MyContext) {
         expiresIn: '2 days',
       });
 
-    return {user};
+      console.log(token)
+
+    return ({token});
   }
 }

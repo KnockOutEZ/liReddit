@@ -1,8 +1,9 @@
 //resolvers are like controllers.
-
+import {sign,verify} from 'jsonwebtoken'
 import { User } from "../entities/User";
 import { MyContext } from "src/types";
 import * as argon2 from "argon2";
+import { isAuth } from "../isAuth";
 import {
   Arg,
   Ctx,
@@ -10,9 +11,10 @@ import {
   InputType,
   Mutation,
   ObjectType,
+  Query,
   Resolver,
+  UseMiddleware,
 } from "type-graphql";
-import { t } from "@mikro-orm/core";
 
 //user register type
 @InputType()
@@ -52,10 +54,20 @@ class UserResponse{
 
     @Field(()=>User,{nullable:true})
     user?:User
+
+    @Field(()=>String)
+    token?:String[]
 }
 
 @Resolver()
 export class UserResolver {
+
+@Query(() => String)
+@UseMiddleware(isAuth)
+async Me(@Ctx() { payload }: MyContext) {
+    return `Your user id : ${payload!.userId}`;
+}
+
 
     //Register a new user
   @Mutation(() => UserResponse)
@@ -149,7 +161,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async login(
     @Arg("options") options: UserLogin,
-    @Ctx() { em }: MyContext
+    @Ctx() { em,res }: MyContext
   ): Promise<UserResponse> {
     //checking if username exists in db
     const user = await em.findOne(User,{username:options.username})
@@ -177,6 +189,11 @@ export class UserResolver {
             ]
         }
     }
+
+ const token= await sign({ _id: user.id?.toString(), name: user.username }, "process.env.JWT_SECRET",{
+        expiresIn: '2 days',
+      });
+
     return {user};
   }
 }

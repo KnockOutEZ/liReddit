@@ -17,13 +17,9 @@ const main = async () => {
   const generator = orm.getSchemaGenerator();
   await generator.updateSchema();
 
-//   creating a post in DB
-  // const post = orm.em.fork({}).create(Post, {
-  //   title: "my first post12",
-  // });
-  // await orm.em.persistAndFlush(post);
 
 const app = express()
+
 
 const apolloServer = new ApolloServer({
   schema: await buildSchema({
@@ -31,7 +27,7 @@ const apolloServer = new ApolloServer({
     validate: false,
   }),
     //exporting orm.em to all resolvers
-  context:()=>({em:orm.em}),
+  context:({req,res})=>({em:orm.em,req,res}),
 });
 
 apolloServer.applyMiddleware({app})

@@ -66,10 +66,20 @@ export class UserResolver {
 @Mutation(() => String)
 async Me(
     @Arg("token") token:string,
-    @Ctx() { }: MyContext) {
-    // const jwt = token.split(" ")[1];
-    const payload = verify(token, "process.env.JWT_SECRET");
-    // payload.name
+    @Ctx() { req }: MyContext) {
+    let payload
+
+  try {
+    payload = verify(token, "process.env.JWT_SECRET");
+    console.log(payload);
+  } catch (err) {
+    const authorization = req.headers["authorization"];
+
+  if (!authorization) {
+    throw new Error("Not authenticated");
+  }
+  }
+
     return(JSON.stringify(payload))
 }
 

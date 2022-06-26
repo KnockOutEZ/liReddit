@@ -12,10 +12,10 @@ const main = async () => {
   const orm = await MikroORM.init(mikroConfig);
   await orm.getMigrator().up;
 //   creating a post in DB
-//   const post = orm.em.fork({}).create(Post, {
-//     title: "my first post",
-//   });
-//   await orm.em.persistAndFlush(post);
+  // const post = orm.em.fork({}).create(Post, {
+  //   title: "my first post12",
+  // });
+  // await orm.em.persistAndFlush(post);
 
 const app = express()
 

@@ -169,7 +169,13 @@ async Me(
         }
     }
 
-    return {user};
+    const token= await sign({ _id: user.id?.toString(), name: user.username }, "process.env.JWT_SECRET",{
+        expiresIn: '2 days',
+      });
+
+      console.log(token)
+
+    return ({token});
   }
 
   //login user if username matches

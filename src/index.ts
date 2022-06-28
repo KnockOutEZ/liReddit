@@ -36,12 +36,12 @@ app.listen(4000,()=>{
   console.log("its running")
 })
 
-  const post = await orm.em.find(Post,{});
-  const user = await orm.em.find(User,{});
-  console.log(post)
-  console.log(user)
+  // const post = await orm.em.find(Post,{});
+  // const user = await orm.em.find(User,{});
+  // console.log(post)
+  // console.log(user)
 };
 
 main().catch((err) => {
-  console.error(err);
+  console.log(err);
 });

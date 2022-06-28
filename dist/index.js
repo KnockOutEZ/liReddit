@@ -8,8 +8,6 @@ const core_1 = require("@mikro-orm/core");
 const apollo_server_express_1 = require("apollo-server-express");
 const express_1 = __importDefault(require("express"));
 const type_graphql_1 = require("type-graphql");
-const Post_1 = require("./entities/Post");
-const User_1 = require("./entities/User");
 const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
 const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
@@ -30,12 +28,8 @@ const main = async () => {
     app.listen(4000, () => {
         console.log("its running");
     });
-    const post = await orm.em.find(Post_1.Post, {});
-    const user = await orm.em.find(User_1.User, {});
-    console.log(post);
-    console.log(user);
 };
 main().catch((err) => {
-    console.error(err);
+    console.log(err);
 });
 //# sourceMappingURL=index.js.map

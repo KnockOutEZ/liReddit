@@ -47,17 +47,24 @@ class FieldError{
     message:String
 }
 
+  //token and user details handling field and message
+  @ObjectType()
+  class TokenAndUser {
+      @Field()
+      user:User
+  
+      @Field()
+      token:String
+  }
+
 //for error handling
 @ObjectType()
 class UserResponse{
     @Field(()=>[FieldError],{nullable:true})
     errors?:FieldError[]
 
-    @Field(()=>User,{nullable:true})
-    user?:User
-
-    @Field(()=>String,{nullable:true})
-    token?:String
+    @Field(()=>[TokenAndUser],{nullable:true})
+    userData?:TokenAndUser[]
 }
 
 @Resolver()
@@ -135,14 +142,14 @@ async Me(
 
 
     const hashedPassword = await argon2.hash(options.password);
-    const user = em.create(User, {
+    const userObj = em.create(User, {
       username: options.username,
       email: options.email,
       password: hashedPassword,
     });
     
     try{
-        await em.persistAndFlush(user);
+        await em.persistAndFlush(userObj);
     }catch(err){
         //check for duplicate username
         if(err.detail.includes("Key (username)")){
@@ -169,13 +176,20 @@ async Me(
         }
     }
 
-    const token= await sign({ _id: user.id?.toString(), name: user.username }, "process.env.JWT_SECRET",{
-        expiresIn: '2 days',
+    const tokenString= await sign({ _id: userObj.id?.toString(), name: userObj.username }, "process.env.JWT_SECRET",{
+        expiresIn: '365 days',
       });
 
-      console.log(token)
+      console.log(tokenString)
 
-    return ({token});
+      return{
+        userData:[
+            {
+                user:userObj,
+                token:tokenString
+            }
+        ]
+    }
   }
 
   //login user if username matches
@@ -212,11 +226,18 @@ async Me(
     }
 
  const token= await sign({ _id: user.id?.toString(), name: user.username }, "process.env.JWT_SECRET",{
-        expiresIn: '2 days',
+        expiresIn: '365 days',
       });
 
       console.log(token)
 
-    return ({token});
+      return{
+        userData:[
+            {
+                user:user,
+                token:token
+            }
+        ]
+    };
   }
 }
